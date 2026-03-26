@@ -106,7 +106,7 @@ public class StudentService {
         BigDecimal fee = req.getMonthlyFee() != null
                 ? req.getMonthlyFee()
                 : new BigDecimal("400.00");
-
+// ai suggestion seat changes remove
         Seat seat = allocateSeat(req.getGender(), req.getSeatSection());
         Student student = new Student(
                 user,
@@ -256,6 +256,7 @@ public class StudentService {
     public void deactivate(Long id) {
         Student student = requireStudent(id);
         student.getUser().setIsActive(false);
+        releaseSeatIfAssigned(student);
         // Force check-out if currently checked in
         if (student.isCheckedIn()) {
             student.setCurrentCheckIn(null);
@@ -438,6 +439,11 @@ public class StudentService {
     @Transactional
     public void expireSubscriptions() {
         int updated = studentRepository.expireSubscriptions(LocalDate.now());
+        studentRepository.findBySeatNumberIsNotNull().forEach(student -> {
+            if (!student.hasActiveSubscription()) {
+                releaseSeatIfAssigned(student);
+            }
+        });
         if (updated > 0) {
             System.out.println("Subscription expiry job: marked {} student(s) as INACTIVE " + updated);
         }
@@ -489,5 +495,20 @@ public class StudentService {
                     return String.format("%s%03d", prefix, next);
                 })
                 .orElse(prefix + "001");
+    }
+
+    private void releaseSeatIfAssigned(Student student) {
+        if (student.getSeatNumber() == null || student.getSeatNumber().isBlank()) {
+            return;
+        }
+
+        seatRepository.findBySeatNumber(student.getSeatNumber()).ifPresent(seat -> {
+            seat.setStatus(SeatStatus.AVAILABLE);
+            seat.setStudentId(null);
+            seatRepository.save(seat);
+        });
+
+        student.setSeatNumber(null);
+        studentRepository.save(student);
     }
 }

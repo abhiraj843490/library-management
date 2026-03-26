@@ -12,6 +12,8 @@ public interface SeatRepository extends JpaRepository<Seat, Long> {
 
     Optional<Seat> findBySeatNumber(String seatNumber);
 
+    Optional<Seat> findByStudentId(Long studentId);
+
     boolean existsBySeatNumber(String seatNumber);
 
     List<Seat> findByGenderAndSection(Gender gender, SeatSection section);

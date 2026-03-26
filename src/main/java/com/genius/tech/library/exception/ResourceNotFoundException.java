@@ -22,4 +22,8 @@ public class ResourceNotFoundException extends RuntimeException {
     public static ResourceNotFoundException payment(Long id) {
         return new ResourceNotFoundException("Payment transaction not found with id: " + id);
     }
+
+    public static ResourceNotFoundException booking(Long id) {
+        return new ResourceNotFoundException("Booking not found with id: " + id);
+    }
 }

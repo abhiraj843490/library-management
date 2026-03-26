@@ -31,6 +31,8 @@ public interface StudentRepository
 
     boolean existsBySeatNumber(String seatNumber);
 
+    List<Student> findBySeatNumberIsNotNull();
+
     // ── filtered list (used by StudentController GET /students) ───────────────
 
     @Query("""
