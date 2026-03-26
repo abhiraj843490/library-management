@@ -207,7 +207,7 @@ public class StudentService {
         }
 
         // ── subscription ──────────────────────────────────────────────────────
-        if (req.getSubscriptionStatus() != null) {
+        if (req.getSubscriptionStatus() != null && req.getSubscriptionStatus() == SubscriptionStatus.INACTIVE) {
             student.setSubscriptionStatus(req.getSubscriptionStatus());
             if (student.getSeatNumber() != null) {
                 Student finalStudent = student;
