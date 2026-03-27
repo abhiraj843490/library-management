@@ -25,6 +25,11 @@ spring:
 app:
   cors:
     allowed-origins: http://localhost:3000
+  bootstrap:
+    admin:
+      name: Genius
+      email: admin@genius.tech
+      password: genius
   loan:
     duration-days: 14
   fine:

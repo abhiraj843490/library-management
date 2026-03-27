@@ -15,7 +15,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
-    /** Highest numeric suffix for a given role prefix, e.g. "STU" → max(STU-001..STU-999) */
+    long countByRole(Role role);
+
     @Query("SELECT MAX(u.userCode) FROM User u WHERE u.role = :role")
     Optional<String> findMaxUserCodeByRole(Role role);
 }
