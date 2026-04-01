@@ -33,6 +33,8 @@ public class StudentSummaryResponse {
     private boolean active;
     private LocalDateTime currentCheckIn;
     private LocalDateTime currentCheckOut;
+    private Long lastSessionMinutes;
+    private Long totalAttendanceMinutes;
 
     public LocalDateTime getCurrentCheckIn() {
         return currentCheckIn;
@@ -162,6 +164,22 @@ public class StudentSummaryResponse {
         this.active = active;
     }
 
+    public Long getLastSessionMinutes() {
+        return lastSessionMinutes;
+    }
+
+    public void setLastSessionMinutes(Long lastSessionMinutes) {
+        this.lastSessionMinutes = lastSessionMinutes;
+    }
+
+    public Long getTotalAttendanceMinutes() {
+        return totalAttendanceMinutes;
+    }
+
+    public void setTotalAttendanceMinutes(Long totalAttendanceMinutes) {
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
+    }
+
     public StudentSummaryResponse(Long studentId,
                                   String userCode,
                                   String name,
@@ -176,8 +194,10 @@ public class StudentSummaryResponse {
                                   BigDecimal monthlyFee,
                                   boolean checkedIn,
                                   Boolean active,
+                                  LocalDateTime currentCheckIn,
                                   LocalDateTime currentCheckOut,
-                                  LocalDateTime currentCheckIn) {
+                                  Long lastSessionMinutes,
+                                  Long totalAttendanceMinutes) {
 
         this.studentId = studentId;
         this.userCode = userCode;
@@ -193,7 +213,9 @@ public class StudentSummaryResponse {
         this.monthlyFee = monthlyFee;
         this.checkedIn = checkedIn;
         this.active = active;
+        this.currentCheckIn = currentCheckIn;
         this.currentCheckOut = currentCheckOut;
-        this.currentCheckIn=currentCheckIn;
+        this.lastSessionMinutes = lastSessionMinutes;
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
     }
 }

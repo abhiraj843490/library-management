@@ -33,6 +33,8 @@ public final class StudentMapper {
                 s.isCheckedIn(),
                 s.getCurrentCheckIn(),
                 s.getCurrentCheckOut(),
+                s.getLastSessionMinutes(),
+                s.getTotalAttendanceMinutes(),
                 s.getUser().getIsActive(),
                 s.getCreatedAt(),
                 s.getUpdatedAt()
@@ -57,7 +59,9 @@ public final class StudentMapper {
                 s.isCheckedIn(),
                 s.getUser().getIsActive(),
                 s.getCurrentCheckIn(),
-                s.getCurrentCheckOut()
+                s.getCurrentCheckOut(),
+                s.getLastSessionMinutes(),
+                s.getTotalAttendanceMinutes()
         );
     }
 

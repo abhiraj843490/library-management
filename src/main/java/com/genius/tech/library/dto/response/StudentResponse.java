@@ -42,6 +42,8 @@ public class StudentResponse {
     private boolean checkedIn;
     private LocalDateTime currentCheckIn;
     private LocalDateTime currentCheckOut;
+    private Long lastSessionMinutes;
+    private Long totalAttendanceMinutes;
 
     // ── account state ─────────────────────────────────────────────────────────
     private boolean active;           // user.isActive
@@ -69,6 +71,8 @@ public class StudentResponse {
                            boolean checkedIn,
                            LocalDateTime currentCheckIn,
                            LocalDateTime currentCheckOut,
+                           Long lastSessionMinutes,
+                           Long totalAttendanceMinutes,
                            Boolean active,
                            LocalDateTime createdAt,
                            LocalDateTime updatedAt) {
@@ -90,6 +94,8 @@ public class StudentResponse {
         this.checkedIn = checkedIn;
         this.currentCheckIn = currentCheckIn;
         this.currentCheckOut = currentCheckOut;
+        this.lastSessionMinutes = lastSessionMinutes;
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
         this.active = active;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -231,6 +237,22 @@ public class StudentResponse {
 
     public void setCurrentCheckOut(LocalDateTime currentCheckOut) {
         this.currentCheckOut = currentCheckOut;
+    }
+
+    public Long getLastSessionMinutes() {
+        return lastSessionMinutes;
+    }
+
+    public void setLastSessionMinutes(Long lastSessionMinutes) {
+        this.lastSessionMinutes = lastSessionMinutes;
+    }
+
+    public Long getTotalAttendanceMinutes() {
+        return totalAttendanceMinutes;
+    }
+
+    public void setTotalAttendanceMinutes(Long totalAttendanceMinutes) {
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
     }
 
     public boolean isActive() {

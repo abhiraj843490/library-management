@@ -234,13 +234,6 @@ public class StudentService {
         if (req.getMonthlyFee() != null) {
             student.setMonthlyFee(req.getMonthlyFee());
         }
-        if (!req.isCheckedIn()) {
-            student.setCurrentCheckOut(LocalDateTime.now());
-        }
-        if (req.isCheckedIn()) {
-            student.setCurrentCheckIn(LocalDateTime.now());
-        }
-
         userRepository.save(user);
         student = studentRepository.save(student);
 
@@ -393,10 +386,14 @@ public class StudentService {
         LocalDateTime checkInTime = student.getCurrentCheckIn();
         LocalDateTime checkOutTime = LocalDateTime.now();
 
-        long sessionMinutes = Duration.between(checkInTime, checkOutTime).toMinutes();
+        long sessionMinutes = Math.max(Duration.between(checkInTime, checkOutTime).toMinutes(), 0L);
+        long previousTotal = student.getTotalAttendanceMinutes() == null ? 0L : student.getTotalAttendanceMinutes();
+        long totalAttendanceMinutes = previousTotal + sessionMinutes;
 
         student.setCurrentCheckOut(checkOutTime);
-        student.setCurrentCheckIn(null);          // clear live check-in flag
+        student.setLastSessionMinutes(sessionMinutes);
+        student.setTotalAttendanceMinutes(totalAttendanceMinutes);
+//        student.setCurrentCheckIn(null);          // clear live check-in flag
         studentRepository.save(student);
 
         System.out.println("Check-out: student id={} session={}min" + "," + studentId + "," + sessionMinutes);
@@ -408,7 +405,8 @@ public class StudentService {
                 "CHECKED_OUT",
                 checkInTime,
                 checkOutTime,
-                sessionMinutes
+                sessionMinutes,
+                totalAttendanceMinutes
         );
 
 

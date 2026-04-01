@@ -2,6 +2,8 @@ package com.genius.tech.library.dto.response;
 
 import com.genius.tech.library.enums.Role;
 
+import java.math.BigDecimal;
+
 public class AuthUserResponse {
     private Long id;
     private Long studentId;
@@ -13,12 +15,13 @@ public class AuthUserResponse {
     private String gender;
     private String seatSection;
     private String seatNumber;
+    private BigDecimal monthlyFee;
 
     public AuthUserResponse() {
     }
 
     public AuthUserResponse(Long id, Long studentId, String userCode, String name, String email, Role role,
-                            Boolean active, String gender, String seatSection, String seatNumber) {
+                            Boolean active, String gender, String seatSection, String seatNumber, BigDecimal monthlyFee) {
         this.id = id;
         this.studentId = studentId;
         this.userCode = userCode;
@@ -29,6 +32,7 @@ public class AuthUserResponse {
         this.gender = gender;
         this.seatSection = seatSection;
         this.seatNumber = seatNumber;
+        this.monthlyFee = monthlyFee;
     }
 
     public Long getId() {
@@ -109,5 +113,13 @@ public class AuthUserResponse {
 
     public void setSeatNumber(String seatNumber) {
         this.seatNumber = seatNumber;
+    }
+
+    public BigDecimal getMonthlyFee() {
+        return monthlyFee;
+    }
+
+    public void setMonthlyFee(BigDecimal monthlyFee) {
+        this.monthlyFee = monthlyFee;
     }
 }

@@ -23,6 +23,7 @@ public class AttendanceResponse {
 
     /** Duration in minutes — populated only on check-out */
     private Long sessionMinutes;
+    private Long totalAttendanceMinutes;
 
     public AttendanceResponse() {
     }
@@ -46,7 +47,8 @@ public class AttendanceResponse {
                               String action,
                               LocalDateTime checkIn,
                               LocalDateTime checkOut,
-                              Long sessionMinutes) {
+                              Long sessionMinutes,
+                              Long totalAttendanceMinutes) {
 
         this.studentId = studentId;
         this.userCode = userCode;
@@ -55,6 +57,7 @@ public class AttendanceResponse {
         this.checkIn = checkIn;
         this.checkOut = checkOut;
         this.sessionMinutes = sessionMinutes;
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
     }
 
     public Long getStudentId() {
@@ -111,5 +114,13 @@ public class AttendanceResponse {
 
     public void setSessionMinutes(Long sessionMinutes) {
         this.sessionMinutes = sessionMinutes;
+    }
+
+    public Long getTotalAttendanceMinutes() {
+        return totalAttendanceMinutes;
+    }
+
+    public void setTotalAttendanceMinutes(Long totalAttendanceMinutes) {
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
     }
 }

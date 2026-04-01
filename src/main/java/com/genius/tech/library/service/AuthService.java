@@ -12,6 +12,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -48,7 +49,7 @@ public class AuthService {
         String gender = student != null && student.getGender() != null ? student.getGender().name() : null;
         String seatSection = student != null && student.getSeatSection() != null ? student.getSeatSection().name() : null;
         String seatNumber = student != null ? student.getSeatNumber() : null;
-
+        BigDecimal monthlyFee = student != null ? student.getMonthlyFee() : null;
         AuthUserResponse authUser = new AuthUserResponse(
                 user.getId(),
                 studentId,
@@ -59,7 +60,8 @@ public class AuthService {
                 user.getIsActive(),
                 gender,
                 seatSection,
-                seatNumber
+                seatNumber,
+                monthlyFee
         );
 
         // Placeholder token for frontend session flow.

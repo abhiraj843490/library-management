@@ -73,7 +73,7 @@ public class Student {
 
     @Column(name = "monthly_fee", nullable = false, precision = 10, scale = 2)
     @Builder.Default
-    private BigDecimal monthlyFee = new BigDecimal("8500.00");
+    private BigDecimal monthlyFee = new BigDecimal("500.00");
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fee_status", nullable = false, length = 10)
@@ -86,6 +86,12 @@ public class Student {
 
     @Column(name = "current_check_out")
     private LocalDateTime currentCheckOut;    // last check-out time
+
+    @Column(name = "last_session_minutes")
+    private Long lastSessionMinutes;
+
+    @Column(name = "total_attendance_minutes")
+    private Long totalAttendanceMinutes;
 
     // ── audit ────────────────────────────────────────────────────────────────
     @CreationTimestamp
@@ -133,6 +139,8 @@ public class Student {
         this.subscriptionExpiry = subscriptionExpiry;
         this.monthlyFee = monthlyFee;
         this.feeStatus = feeStatus;
+        this.lastSessionMinutes = 0L;
+        this.totalAttendanceMinutes = 0L;
     }
 
     public Long getId() {
@@ -237,6 +245,22 @@ public class Student {
 
     public void setCurrentCheckOut(LocalDateTime currentCheckOut) {
         this.currentCheckOut = currentCheckOut;
+    }
+
+    public Long getLastSessionMinutes() {
+        return lastSessionMinutes;
+    }
+
+    public void setLastSessionMinutes(Long lastSessionMinutes) {
+        this.lastSessionMinutes = lastSessionMinutes;
+    }
+
+    public Long getTotalAttendanceMinutes() {
+        return totalAttendanceMinutes;
+    }
+
+    public void setTotalAttendanceMinutes(Long totalAttendanceMinutes) {
+        this.totalAttendanceMinutes = totalAttendanceMinutes;
     }
 
     public LocalDateTime getCreatedAt() {
