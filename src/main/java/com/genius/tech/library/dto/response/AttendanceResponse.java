@@ -1,7 +1,5 @@
 package com.genius.tech.library.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
 
 import java.time.LocalDateTime;
 

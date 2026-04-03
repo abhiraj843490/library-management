@@ -2,7 +2,6 @@ package com.genius.tech.library.dto.request;
 
 import com.genius.tech.library.enums.PaymentMethod;
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 import java.math.BigDecimal;
 

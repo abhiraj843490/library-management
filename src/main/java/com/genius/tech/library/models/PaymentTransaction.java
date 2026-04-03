@@ -3,7 +3,6 @@ package com.genius.tech.library.models;
 import com.genius.tech.library.enums.PaymentMethod;
 import com.genius.tech.library.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;

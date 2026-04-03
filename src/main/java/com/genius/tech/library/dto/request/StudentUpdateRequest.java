@@ -4,7 +4,6 @@ import com.genius.tech.library.enums.FeeStatus;
 import com.genius.tech.library.enums.SeatSection;
 import com.genius.tech.library.enums.SubscriptionStatus;
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

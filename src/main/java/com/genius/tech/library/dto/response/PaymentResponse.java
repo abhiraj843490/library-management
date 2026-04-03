@@ -2,8 +2,6 @@ package com.genius.tech.library.dto.response;
 
 import com.genius.tech.library.enums.PaymentMethod;
 import com.genius.tech.library.enums.PaymentStatus;
-import lombok.Builder;
-import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

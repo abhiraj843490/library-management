@@ -5,7 +5,7 @@ import com.genius.tech.library.enums.Gender;
 import com.genius.tech.library.enums.SeatSection;
 import com.genius.tech.library.enums.SubscriptionStatus;
 import jakarta.persistence.*;
-import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -65,19 +65,16 @@ public class Student {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "subscription_status", nullable = false, length = 10)
-    @Builder.Default
     private SubscriptionStatus subscriptionStatus = SubscriptionStatus.ACTIVE;
 
     @Column(name = "subscription_expiry", nullable = false)
     private LocalDateTime subscriptionExpiry;
 
     @Column(name = "monthly_fee", nullable = false, precision = 10, scale = 2)
-    @Builder.Default
-    private BigDecimal monthlyFee = new BigDecimal("500.00");
+    private BigDecimal monthlyFee = new BigDecimal("8500.00");
 
     @Enumerated(EnumType.STRING)
     @Column(name = "fee_status", nullable = false, length = 10)
-    @Builder.Default
     private FeeStatus feeStatus = FeeStatus.PENDING;
 
     // ── live attendance state ────────────────────────────────────────────────
@@ -104,7 +101,6 @@ public class Student {
 
     // ── child collections ────────────────────────────────────────────────────
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
     private List<PaymentTransaction> payments = new ArrayList<>();
 
     // ── helpers ──────────────────────────────────────────────────────────────

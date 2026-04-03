@@ -1,12 +1,6 @@
 package com.genius.tech.library.dto;
 
-import com.genius.tech.library.enums.FeeStatus;
 import com.genius.tech.library.enums.Gender;
-import com.genius.tech.library.enums.SubscriptionStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
 
 public class StudentDto {
     String name;

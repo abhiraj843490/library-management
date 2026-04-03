@@ -3,7 +3,6 @@ package com.genius.tech.library.dto.request;
 import com.genius.tech.library.enums.Gender;
 import com.genius.tech.library.enums.SeatSection;
 import jakarta.validation.constraints.*;
-import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

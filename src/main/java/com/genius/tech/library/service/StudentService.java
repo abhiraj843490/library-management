@@ -20,8 +20,6 @@ import com.genius.tech.library.repository.PaymentTransactionRepository;
 import com.genius.tech.library.repository.SeatRepository;
 import com.genius.tech.library.repository.StudentRepository;
 import com.genius.tech.library.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -233,6 +231,12 @@ public class StudentService {
 
         if (req.getMonthlyFee() != null) {
             student.setMonthlyFee(req.getMonthlyFee());
+        }
+        if (!req.isCheckedIn()) {
+            student.setCurrentCheckOut(LocalDateTime.now());
+        }
+        if (req.isCheckedIn()) {
+            student.setCurrentCheckIn(LocalDateTime.now());
         }
         userRepository.save(user);
         student = studentRepository.save(student);
