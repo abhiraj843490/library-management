@@ -22,6 +22,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -276,6 +278,26 @@ public class StudentController {
         AttendanceResponse result = studentService.checkOut(id);
         return ResponseEntity.ok(
                 ApiResponse.ok("Check-out recorded", result));
+    }
+
+    @GetMapping("/{id}/attendance")
+    public ResponseEntity<ApiResponse<List<AttendanceCalendarDayResponse>>> getAttendanceCalendar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String month) {
+
+        YearMonth yearMonth = (month == null || month.isBlank())
+                ? YearMonth.now()
+                : parseYearMonth(month);
+        List<AttendanceCalendarDayResponse> data = studentService.getAttendanceCalendar(id, yearMonth);
+        return ResponseEntity.ok(ApiResponse.ok("Attendance calendar retrieved", data));
+    }
+
+    private YearMonth parseYearMonth(String value) {
+        try {
+            return YearMonth.parse(value);
+        } catch (DateTimeParseException ex) {
+            throw new IllegalArgumentException("Invalid month format. Use YYYY-MM");
+        }
     }
 
 }

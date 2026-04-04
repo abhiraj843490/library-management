@@ -5,6 +5,7 @@ import com.genius.tech.library.dto.request.PaymentRequest;
 import com.genius.tech.library.dto.request.StudentCreateRequest;
 import com.genius.tech.library.dto.request.StudentUpdateRequest;
 import com.genius.tech.library.dto.response.AttendanceResponse;
+import com.genius.tech.library.dto.response.AttendanceCalendarDayResponse;
 import com.genius.tech.library.dto.response.PaymentResponse;
 import com.genius.tech.library.dto.response.StudentResponse;
 import com.genius.tech.library.dto.response.StudentSummaryResponse;
@@ -13,9 +14,11 @@ import com.genius.tech.library.exception.BusinessException;
 import com.genius.tech.library.exception.ResourceNotFoundException;
 import com.genius.tech.library.mapper.StudentMapper;
 import com.genius.tech.library.models.PaymentTransaction;
+import com.genius.tech.library.models.AttendanceSession;
 import com.genius.tech.library.models.Seat;
 import com.genius.tech.library.models.Student;
 import com.genius.tech.library.models.User;
+import com.genius.tech.library.repository.AttendanceSessionRepository;
 import com.genius.tech.library.repository.PaymentTransactionRepository;
 import com.genius.tech.library.repository.SeatRepository;
 import com.genius.tech.library.repository.StudentRepository;
@@ -32,7 +35,12 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Core service for student lifecycle management.
@@ -60,6 +68,8 @@ public class StudentService {
 
     @Autowired
     SeatRepository seatRepository;
+    @Autowired
+    AttendanceSessionRepository attendanceSessionRepository;
 
     /**
      * Enrol a new student.
@@ -104,7 +114,8 @@ public class StudentService {
         BigDecimal fee = req.getMonthlyFee() != null
                 ? req.getMonthlyFee()
                 : new BigDecimal("400.00");
-// ai suggestion seat changes remove
+
+        // ai suggestion seat changes remove
         Seat seat = allocateSeat(req.getGender(), req.getSeatSection());
         Student student = new Student(
                 user,
@@ -232,12 +243,13 @@ public class StudentService {
         if (req.getMonthlyFee() != null) {
             student.setMonthlyFee(req.getMonthlyFee());
         }
-        if (!req.isCheckedIn()) {
-            student.setCurrentCheckOut(LocalDateTime.now());
-        }
-        if (req.isCheckedIn()) {
-            student.setCurrentCheckIn(LocalDateTime.now());
-        }
+        // handling with check-in/check-out APIs
+//        if (!req.isCheckedIn()) {
+//            student.setCurrentCheckOut(LocalDateTime.now());
+//        }
+//        if (req.isCheckedIn()) {
+//            student.setCurrentCheckIn(LocalDateTime.now());
+//        }
         userRepository.save(user);
         student = studentRepository.save(student);
 
@@ -345,17 +357,28 @@ public class StudentService {
 
         Student student = requireStudent(studentId);
         String name = student.getUser().getName();
+        LocalDate today = LocalDate.now();
 
         if (!student.getUser().getIsActive()) {
             throw BusinessException.inactiveStudent(name);
         }
 
-        if (student.isCheckedIn()) {
-            throw BusinessException.alreadyCheckedIn(name);
+        AttendanceSession existingSession =
+                attendanceSessionRepository.findByStudentIdAndAttendanceDate(studentId, today).orElse(null);
+
+        if (existingSession != null) {
+            if (existingSession.getCheckOut() == null) {
+                throw BusinessException.alreadyCheckedIn(name);
+            }
+            throw BusinessException.alreadyCheckedOutForToday(name);
         }
 
         LocalDateTime now = LocalDateTime.now();
+        AttendanceSession session = new AttendanceSession(student, today, now, "PRESENT");
+        attendanceSessionRepository.save(session);
+
         student.setCurrentCheckIn(now);
+        student.setCurrentCheckOut(null);
         studentRepository.save(student);
 
         System.out.println("Check-in: student id={} at {}" + "," + studentId + "," + now);
@@ -382,22 +405,32 @@ public class StudentService {
 
         Student student = requireStudent(studentId);
         String name = student.getUser().getName();
+        LocalDate today = LocalDate.now();
 
-        if (!student.isCheckedIn()) {
+        AttendanceSession session = attendanceSessionRepository
+                .findByStudentIdAndAttendanceDate(studentId, today)
+                .orElseThrow(() -> BusinessException.notCheckedIn(name));
+
+        if (session.getCheckOut() != null || session.getCheckIn() == null) {
             throw BusinessException.notCheckedIn(name);
         }
 
-        LocalDateTime checkInTime = student.getCurrentCheckIn();
+        LocalDateTime checkInTime = session.getCheckIn();
         LocalDateTime checkOutTime = LocalDateTime.now();
 
         long sessionMinutes = Math.max(Duration.between(checkInTime, checkOutTime).toMinutes(), 0L);
         long previousTotal = student.getTotalAttendanceMinutes() == null ? 0L : student.getTotalAttendanceMinutes();
         long totalAttendanceMinutes = previousTotal + sessionMinutes;
 
+        session.setCheckOut(checkOutTime);
+        session.setSessionMinutes(sessionMinutes);
+        session.setStatus("PRESENT");
+        attendanceSessionRepository.save(session);
+
+//        student.setCurrentCheckIn(null);
         student.setCurrentCheckOut(checkOutTime);
         student.setLastSessionMinutes(sessionMinutes);
         student.setTotalAttendanceMinutes(totalAttendanceMinutes);
-//        student.setCurrentCheckIn(null);          // clear live check-in flag
         studentRepository.save(student);
 
         System.out.println("Check-out: student id={} session={}min" + "," + studentId + "," + sessionMinutes);
@@ -414,6 +447,42 @@ public class StudentService {
         );
 
 
+    }
+
+    public List<AttendanceCalendarDayResponse> getAttendanceCalendar(Long studentId, YearMonth month) {
+        requireStudent(studentId);
+        YearMonth safeMonth = month == null ? YearMonth.now() : month;
+
+        LocalDate monthStart = safeMonth.atDay(1);
+        LocalDate monthEnd = safeMonth.atEndOfMonth();
+        LocalDate today = LocalDate.now();
+
+        List<AttendanceSession> sessions = attendanceSessionRepository
+                .findByStudentIdAndAttendanceDateBetweenOrderByAttendanceDateAsc(studentId, monthStart, monthEnd);
+
+        Map<LocalDate, AttendanceSession> byDate = new HashMap<>();
+        for (AttendanceSession session : sessions) {
+            byDate.put(session.getAttendanceDate(), session);
+        }
+
+        List<AttendanceCalendarDayResponse> response = new ArrayList<>();
+        for (LocalDate day = monthStart; !day.isAfter(monthEnd); day = day.plusDays(1)) {
+            AttendanceSession session = byDate.get(day);
+            if (session != null) {
+                response.add(new AttendanceCalendarDayResponse(
+                        day,
+                        "PRESENT",
+                        session.getCheckIn(),
+                        session.getCheckOut(),
+                        session.getSessionMinutes()
+                ));
+            } else if (!day.isAfter(today)) {
+                response.add(new AttendanceCalendarDayResponse(day, "ABSENT", null, null, null));
+            } else {
+                response.add(new AttendanceCalendarDayResponse(day, "NO_RECORD", null, null, null));
+            }
+        }
+        return response;
     }
 
     // ═════════════════════════════════════════════════════════════════════════

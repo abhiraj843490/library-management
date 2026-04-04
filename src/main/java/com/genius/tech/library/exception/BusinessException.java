@@ -44,6 +44,12 @@ public class BusinessException extends RuntimeException {
                 "ALREADY_CHECKED_IN");
     }
 
+    public static BusinessException alreadyCheckedOutForToday(String name) {
+        return new BusinessException(
+                name + " has already checked out for today",
+                "ALREADY_CHECKED_OUT_TODAY");
+    }
+
     public static BusinessException notCheckedIn(String name) {
         return new BusinessException(
                 name + " is not currently checked in",
