@@ -96,14 +96,15 @@ public class BookingService {
             throw BusinessException.genderZoneMismatch();
         }
 
-        if (student.getSeatNumber() != null && !student.getSeatNumber().isBlank()
-                && !student.getSeatNumber().equalsIgnoreCase(seat.getSeatNumber())) {
-            throw new BusinessException(
-                    "Seat already allocated to student until subscription expiry: " + student.getSeatNumber(),
-                    "SEAT_ALREADY_ALLOCATED_TO_STUDENT"
-            );
-        }
+//        if (student.getSeatNumber() != null && !student.getSeatNumber().isBlank()
+//                && !student.getSeatNumber().equalsIgnoreCase(seat.getSeatNumber())) {
+//            throw new BusinessException(
+//                    "Seat already allocated to student until subscription expiry: " + student.getSeatNumber(),
+//                    "SEAT_ALREADY_ALLOCATED_TO_STUDENT"
+//            );
+//        }
 
+        // UI: send 1. time slot name - 2. Backend need to validate it -- if same user have same time slot then throw error
         if (seat.getStatus() == SeatStatus.ALLOCATED
                 && (seat.getStudentId() == null || !seat.getStudentId().equals(student.getId()))) {
             throw new BusinessException("Seat is already allocated to another student", "SEAT_ALREADY_ALLOCATED");
@@ -176,6 +177,12 @@ public class BookingService {
         booking.setCanBeCancelled(false);
         booking.setCancelledReason(request.getReason().trim());
         booking.setCancelledAt(LocalDateTime.now());
+
+        seatRepository.findById(booking.getSeatId()).ifPresent(seat -> {
+            seat.setStatus(SeatStatus.AVAILABLE);
+            seat.setStudentId(null);
+            seatRepository.save(seat);
+        });
 
         Booking saved = bookingRepository.save(booking);
         return toResponse(saved);

@@ -15,10 +15,12 @@ import com.genius.tech.library.exception.ResourceNotFoundException;
 import com.genius.tech.library.mapper.StudentMapper;
 import com.genius.tech.library.models.PaymentTransaction;
 import com.genius.tech.library.models.AttendanceSession;
+import com.genius.tech.library.models.Booking;
 import com.genius.tech.library.models.Seat;
 import com.genius.tech.library.models.Student;
 import com.genius.tech.library.models.User;
 import com.genius.tech.library.repository.AttendanceSessionRepository;
+import com.genius.tech.library.repository.BookingRepository;
 import com.genius.tech.library.repository.PaymentTransactionRepository;
 import com.genius.tech.library.repository.SeatRepository;
 import com.genius.tech.library.repository.StudentRepository;
@@ -70,6 +72,8 @@ public class StudentService {
     SeatRepository seatRepository;
     @Autowired
     AttendanceSessionRepository attendanceSessionRepository;
+    @Autowired
+    BookingRepository bookingRepository;
 
     /**
      * Enrol a new student.
@@ -135,6 +139,32 @@ public class StudentService {
         seat.setStatus(SeatStatus.ALLOCATED);
         seat.setStudentId(student.getId());
         seatRepository.save(seat);
+
+        // Create default payment transaction for the new student
+        String txnCode = generateTransactionCode();
+        PaymentTransaction defaultPayment = new PaymentTransaction(
+                txnCode,
+                student,
+                fee,
+                PaymentStatus.PENDING,
+                PaymentMethod.CASH, // Default payment method
+                null // paidAt is null for pending payments
+        );
+        paymentRepository.save(defaultPayment);
+
+        // Create initial allotted booking for the student (welcome booking for tomorrow)
+        Booking welcomeBooking = new Booking();
+        welcomeBooking.setStudent(student);
+        welcomeBooking.setSeatId(seat.getId());
+        welcomeBooking.setTimeSlotId(1); // Morning 1 slot (9-11 AM)
+        welcomeBooking.setSpaceName(seat.getSeatNumber());
+        welcomeBooking.setSlotName("Morning 1 (9-11 AM)");
+        welcomeBooking.setBookingDate(LocalDate.now().plusDays(1)); // Tomorrow
+        welcomeBooking.setBookingType(BookingType.SOLO);
+        welcomeBooking.setGroupSize(1);
+        welcomeBooking.setStatus(BookingStatus.CONFIRMED);
+        welcomeBooking.setNotes("Welcome booking - Initial seat allocation");
+        bookingRepository.save(welcomeBooking);
 
         System.out.println(user.getUserCode() + ", " + user.getEmail());
         return StudentMapper.toResponse(student);
